@@ -6,11 +6,6 @@ public class SudokuTable {
 	private int blockSize;
 	
 	private int[][] table;
-	private boolean[][][] possibilities;
-	
-	private int nextX;
-	private int nextY;
-	private int nextValue;
 	
 	public SudokuTable(int[][] table) {
 		if (table == null || table.length == 0 || table.length != table[0].length) {
@@ -24,7 +19,6 @@ public class SudokuTable {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
-		initPossibilities();
 		this.table = new int[size][size];
 		for (int i = 0; i < size; ++i) {
 			for (int j = 0; j < size; ++j) {
@@ -37,14 +31,18 @@ public class SudokuTable {
 		} catch (IllegalStateException e) {
 			throw new IllegalArgumentException("Integrity problem in argument.", e);
 		}
-		
-//		for (int i = 0; i < size; ++i) {
-//			for (int j = 0; j < size; ++j) {
-//				if (this.table[i][j] > 0) {
-//					eliminatePossibilitiesForCell(i, j);
-//				}
-//			}
-//		}
+	}
+	
+	public int getSize() {
+		return size;
+	}
+
+	public int getBlockSize() {
+		return blockSize;
+	}
+	
+	public int get(int x, int y) {
+		return table[x][y];
 	}
 
 	private void checkIntegrity() {
@@ -54,152 +52,67 @@ public class SudokuTable {
 	}
 
 	private void checkRowsIntegrity() {
-		for (int i = 0; i < size; ++i) {
-			int[] cardinality = new int[size];
-			for (int j = 0; j < size; ++j) {
-				if (table[i][j] < 0) {
-					continue;
-				}
-				if (cardinality[table[i][j]] > 0) {
-					throw new IllegalStateException("Integrity problem in row #" + (i + 1) + ".");
-				}
-				++cardinality[table[i][j]];
+		for (int rowIndex = 0; rowIndex < size; ++rowIndex) {
+			checkRowIntegrity(rowIndex);
+		}
+	}
+	
+	private void checkRowIntegrity(int rowIndex) {
+		int[] cardinality = new int[size];
+		for (int columnIndex = 0; columnIndex < size; ++columnIndex) {
+			if (table[rowIndex][columnIndex] < 0) {
+				continue;
 			}
+			if (cardinality[table[rowIndex][columnIndex]] > 0) {
+				throw new IllegalStateException("Integrity problem in row #" + (rowIndex + 1) + ".");
+			}
+			++cardinality[table[rowIndex][columnIndex]];
 		}
 	}
 	
 	private void checkColumnsIntegrity() {
-		for (int i = 0; i < size; ++i) {
-			int[] cardinality = new int[size];
-			for (int j = 0; j < size; ++j) {
-				if (table[j][i] < 0) {
-					continue;
-				}
-				if (cardinality[table[j][i]] > 0) {
-					throw new IllegalStateException("Integrity problem in column #" + (i + 1) + ".");
-				}
-				++cardinality[table[j][i]];
+		for (int columnIndex = 0; columnIndex < size; ++columnIndex) {
+			checkColumnIntegrity(columnIndex);
+		}
+	}
+	
+	private void checkColumnIntegrity(int columnIndex) {
+		int[] cardinality = new int[size];
+		for (int rowIndex = 0; rowIndex < size; ++rowIndex) {
+			if (table[rowIndex][columnIndex] < 0) {
+				continue;
 			}
+			if (cardinality[table[rowIndex][columnIndex]] > 0) {
+				throw new IllegalStateException("Integrity problem in column #" + (columnIndex + 1) + ".");
+			}
+			++cardinality[table[rowIndex][columnIndex]];
 		}
 	}
 	
 	private void checkBlocksIntegrity() {
-		for (int blockX = 0; blockX < blockSize; ++blockX) {
-			for (int blockY = 0; blockY < blockSize; ++blockY) {
-				int[] cardinality = new int[size];
-				for (int i = 0; i < blockSize; ++i) {
-					int x = blockX * blockSize + i;
-					for (int j = 0; j < blockSize; ++j) {
-						int y = blockY * blockSize + j;
-						if (table[x][y] < 0) {
-							continue;
-						}
-						if (cardinality[table[x][y]] > 0) {
-							throw new IllegalStateException("Integrity problem in block ("
-									+ (x + 1) + "," + (y + 1) + ").");
-						}
-						++cardinality[table[x][y]];
-					}
-				}
-			}
-		}
-	}
-
-	private void initPossibilities() {
-		possibilities = new boolean[size][size][size];
-		for (int i = 0; i < size; ++i) {
-			for (int j = 0; j < size; ++j) {
-				for (int k = 0; k < size; ++ k) {
-					possibilities[i][j][k] = true;
-				}
+		for (int blockRowIndex = 0; blockRowIndex < blockSize; ++blockRowIndex) {
+			for (int blockColumnIndex = 0; blockColumnIndex < blockSize; ++blockColumnIndex) {
+				checkBlockIntegrity(blockRowIndex, blockColumnIndex);
 			}
 		}
 	}
 	
-	private void eliminatePossibilitiesForCell(int i, int j) {
-		eliminatePossibilitiesInRow(i, j);
-		eliminatePossibilitiesInColumn(j, i);
-		eliminatePossibilitiesInBlock(i, j);
-	}
-	
-	private void eliminatePossibilitiesInRow(int i, int j) {
-		int value = table[i][j] - 1;
-		for (int k = 0; k < size; ++k) {
-			if (k == j) {
-				continue;
-			}
-			possibilities[i][k][value] = false;
-		}
-	}
-	
-	private void eliminatePossibilitiesInColumn(int i, int j) {
-		int value = table[i][j] - 1;
-		for (int k = 0; k < size; ++k) {
-			if (k == i) {
-				continue;
-			}
-			possibilities[k][j][value] = false;
-		}
-	}
-	
-	private void eliminatePossibilitiesInBlock(int i, int j) {
-		int value = table[i][j] - 1;
-		int blockX = i / blockSize;
-		int blockY = j / blockSize;
-		
-		for (int k = 0; k < blockSize; ++k) {
-			int x = blockX * blockSize + k;
-			for (int l = 0; l < blockSize; ++l) {
-				int y = blockY * blockSize + l;
-				if (x == i && y == j) {
+	private void checkBlockIntegrity(int blockRowIndex, int blockColumnIndex) {
+		int[] cardinality = new int[size];
+		for (int relRowIndex = 0; relRowIndex < blockSize; ++relRowIndex) {
+			int absRowIndex = blockRowIndex * blockSize + relRowIndex;
+			for (int relColumnIndex = 0; relColumnIndex < blockSize; ++relColumnIndex) {
+				int absColumnIndex = blockColumnIndex * blockSize + relColumnIndex;
+				if (table[absRowIndex][absColumnIndex] < 0) {
 					continue;
 				}
-				possibilities[x][y][value] = false;
-			}
-		}
-	}
-	
-	private void findNextForLastCell(int i, int j) {
-		
-	}
-	
-	private boolean hasSinglePossibility(int i, int j) {
-		int possibilityCount = 0;
-		for (int k = 0; k < size; ++k) {
-			if (possibilities[i][j][k]) {
-				++possibilityCount;
-				nextValue = k;
-				if (possibilityCount > 1) {
-					nextValue = -1;
-					return false;
+				if (cardinality[table[absRowIndex][absColumnIndex]] > 0) {
+					throw new IllegalStateException("Integrity problem in block ("
+							+ (absRowIndex + 1) + "," + (absColumnIndex + 1) + ").");
 				}
+				++cardinality[table[absRowIndex][absColumnIndex]];
 			}
 		}
-		return possibilityCount == 1;
-	}
-	
-	private void findNextInRow(int i) {
-		for (int k = 0; k < size; ++k) {
-			if (hasSinglePossibility(i, k)) {
-				nextX = i;
-				nextY = k;
-				return;
-			}
-		}
-	}
-	
-	private void findNextInColumn(int i) {
-		for (int k = 0; k < size; ++k) {
-			if (hasSinglePossibility(k, i)) {
-				nextX = k;
-				nextY = i;
-				return;
-			}
-		}
-	}
-
-	public int getSize() {
-		return size;
 	}
 
 }
