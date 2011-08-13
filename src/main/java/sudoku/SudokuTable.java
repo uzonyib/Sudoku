@@ -44,6 +44,30 @@ public class SudokuTable {
 	public int get(int x, int y) {
 		return table[x][y];
 	}
+	
+	@Override
+	public String toString() {
+		String separatorLine = "  - - -   - - -   - - -";
+		String columnSeparator = "|";
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < size; ++i) {
+			if (i % blockSize == 0) {
+				builder.append(separatorLine).append("\n");
+			}
+			builder.append(columnSeparator);
+			for (int j = 0; j < size; ++j) {
+				if (j != 0 && j % blockSize == 0) {
+					builder.append(" ").append(columnSeparator);
+				}
+				int value = get(i, j);
+				builder.append(" ").append(value >= 0 ? value + 1 : ".");
+			}
+			builder.append(" ").append(columnSeparator).append("\n");
+		}
+		builder.append(separatorLine);
+		System.out.println(builder.toString());
+		return builder.toString();
+	}
 
 	private void checkIntegrity() {
 		checkRowsIntegrity();
