@@ -1,5 +1,7 @@
 package sudoku;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class SudokuTableTest {
@@ -38,7 +40,7 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testRowIntegrity() {
-		new SudokuTable(new int[][]{
+		new SudokuTable(new int[][] {
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -53,7 +55,7 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testColumnIntegrity() {
-		new SudokuTable(new int[][]{
+		new SudokuTable(new int[][] {
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -68,7 +70,7 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testBlockIntegrity() {
-		new SudokuTable(new int[][]{
+		new SudokuTable(new int[][] {
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -83,7 +85,15 @@ public class SudokuTableTest {
 	
 	@Test
 	public void testIntegrity() {
-		new SudokuTable(simpleTable);
+		SudokuTable sudokuTable = new SudokuTable(simpleTable);
+		assertEquals(9, sudokuTable.getSize());
+		assertEquals(3, sudokuTable.getBlockSize());
+		
+		for (int i = 0; i < 9; ++i) {
+			for (int j = 0; j < 9; ++j) {
+				assertEquals(simpleTable[i][j] - 1, sudokuTable.get(i, j));
+			}
+		}
 	}
 
 }
