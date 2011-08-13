@@ -2,33 +2,33 @@ package sudoku;
 
 public class SudokuTable {
 	
-	private short size;
-	private short blockSize;
+	private int size;
+	private int blockSize;
 	
-	private short[][] table;
-	private short[][][] possibilities;
+	private int[][] table;
+	private boolean[][][] possibilities;
 	
-	private short nextX;
-	private short nextY;
-	private short nextValue;
+	private int nextX;
+	private int nextY;
+	private int nextValue;
 	
-	public SudokuTable(short[][] table) {
+	public SudokuTable(int[][] table) {
 		if (table == null || table.length == 0 || table.length != table[0].length) {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
-		this.size = (short) table.length;
-		this.blockSize = (short) Math.sqrt(size);
+		this.size = table.length;
+		this.blockSize = (int) Math.sqrt(size);
 		
 		if (blockSize * blockSize != size) {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
 		initPossibilities();
-		this.table = new short[size][size];
-		for (short i = 0; i < size; ++i) {
-			for (short j = 0; j < size; ++j) {
-				this.table[i][j] = table[i][j];
+		this.table = new int[size][size];
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
+				this.table[i][j] = table[i][j] - 1;
 			}
 		}
 		
@@ -38,13 +38,13 @@ public class SudokuTable {
 			throw new IllegalArgumentException("Integrity problem in argument.", e);
 		}
 		
-		for (short i = 0; i < size; ++i) {
-			for (short j = 0; j < size; ++j) {
-				if (this.table[i][j] > 0) {
-					eliminatePossibilitiesForCell(i, j);
-				}
-			}
-		}
+//		for (int i = 0; i < size; ++i) {
+//			for (int j = 0; j < size; ++j) {
+//				if (this.table[i][j] > 0) {
+//					eliminatePossibilitiesForCell(i, j);
+//				}
+//			}
+//		}
 	}
 
 	private void checkIntegrity() {
@@ -54,42 +54,51 @@ public class SudokuTable {
 	}
 
 	private void checkRowsIntegrity() {
-		for (short i = 0; i < size; ++i) {
-			short[] cardinality = new short[size];
-			for (short j = 0; j < size; ++j) {
-				if (cardinality[table[i][j] - 1] > 0) {
+		for (int i = 0; i < size; ++i) {
+			int[] cardinality = new int[size];
+			for (int j = 0; j < size; ++j) {
+				if (table[i][j] < 0) {
+					continue;
+				}
+				if (cardinality[table[i][j]] > 0) {
 					throw new IllegalStateException("Integrity problem in row #" + (i + 1) + ".");
 				}
-				++cardinality[table[i][j] - 1];
+				++cardinality[table[i][j]];
 			}
 		}
 	}
 	
 	private void checkColumnsIntegrity() {
-		for (short i = 0; i < size; ++i) {
-			short[] cardinality = new short[size];
-			for (short j = 0; j < size; ++j) {
-				if (cardinality[table[j][i] - 1] > 0) {
+		for (int i = 0; i < size; ++i) {
+			int[] cardinality = new int[size];
+			for (int j = 0; j < size; ++j) {
+				if (table[j][i] < 0) {
+					continue;
+				}
+				if (cardinality[table[j][i]] > 0) {
 					throw new IllegalStateException("Integrity problem in column #" + (i + 1) + ".");
 				}
-				++cardinality[table[j][i] - 1];
+				++cardinality[table[j][i]];
 			}
 		}
 	}
 	
 	private void checkBlocksIntegrity() {
-		for (short blockX = 0; blockX < blockSize; ++blockX) {
-			for (short blockY = 0; blockY < blockSize; ++blockY) {
-				short[] cardinality = new short[size];
-				for (short i = 0; i < blockSize; ++i) {
-					short x = (short) (blockX * blockSize + i);
-					for (short j = 0; j < blockSize; ++j) {
-						short y = (short) (blockY * blockSize + j);
-						if (cardinality[table[x][y] - 1] > 0) {
+		for (int blockX = 0; blockX < blockSize; ++blockX) {
+			for (int blockY = 0; blockY < blockSize; ++blockY) {
+				int[] cardinality = new int[size];
+				for (int i = 0; i < blockSize; ++i) {
+					int x = blockX * blockSize + i;
+					for (int j = 0; j < blockSize; ++j) {
+						int y = blockY * blockSize + j;
+						if (table[x][y] < 0) {
+							continue;
+						}
+						if (cardinality[table[x][y]] > 0) {
 							throw new IllegalStateException("Integrity problem in block ("
 									+ (x + 1) + "," + (y + 1) + ").");
 						}
-						++cardinality[table[x][y] - 1];
+						++cardinality[table[x][y]];
 					}
 				}
 			}
@@ -97,80 +106,80 @@ public class SudokuTable {
 	}
 
 	private void initPossibilities() {
-		this.possibilities = new short[size][size][size];
-		for (short i = 0; i < size; ++i) {
-			for (short j = 0; j < size; ++j) {
-				for (short k = 0; k < size; ++ k) {
-					possibilities[i][j][k] = (short) (k + 1);
+		possibilities = new boolean[size][size][size];
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
+				for (int k = 0; k < size; ++ k) {
+					possibilities[i][j][k] = true;
 				}
 			}
 		}
 	}
 	
-	private void eliminatePossibilitiesForCell(short i, short j) {
+	private void eliminatePossibilitiesForCell(int i, int j) {
 		eliminatePossibilitiesInRow(i, j);
 		eliminatePossibilitiesInColumn(j, i);
 		eliminatePossibilitiesInBlock(i, j);
 	}
 	
-	private void eliminatePossibilitiesInRow(short i, short j) {
-		short value = (short) (table[i][j] - 1);
-		for (short k = 0; k < size; ++k) {
+	private void eliminatePossibilitiesInRow(int i, int j) {
+		int value = table[i][j] - 1;
+		for (int k = 0; k < size; ++k) {
 			if (k == j) {
 				continue;
 			}
-			this.possibilities[i][k][value] = 0;
+			possibilities[i][k][value] = false;
 		}
 	}
 	
-	private void eliminatePossibilitiesInColumn(short i, short j) {
-		short value = (short) (table[i][j] - 1);
-		for (short k = 0; k < size; ++k) {
+	private void eliminatePossibilitiesInColumn(int i, int j) {
+		int value = table[i][j] - 1;
+		for (int k = 0; k < size; ++k) {
 			if (k == i) {
 				continue;
 			}
-			possibilities[k][j][value] = 0;
+			possibilities[k][j][value] = false;
 		}
 	}
 	
-	private void eliminatePossibilitiesInBlock(short i, short j) {
-		short value = (short) (table[i][j] - 1);
-		short blockX = (short) (i / blockSize);
-		short blockY = (short) (j / blockSize);
+	private void eliminatePossibilitiesInBlock(int i, int j) {
+		int value = table[i][j] - 1;
+		int blockX = i / blockSize;
+		int blockY = j / blockSize;
 		
-		for (short k = 0; k < blockSize; ++k) {
-			short x = (short) (blockX * blockSize + k);
-			for (short l = 0; l < blockSize; ++l) {
-				short y = (short) (blockY * blockSize + l);
+		for (int k = 0; k < blockSize; ++k) {
+			int x = blockX * blockSize + k;
+			for (int l = 0; l < blockSize; ++l) {
+				int y = blockY * blockSize + l;
 				if (x == i && y == j) {
 					continue;
 				}
-				possibilities[x][y][value] = 0;
+				possibilities[x][y][value] = false;
 			}
 		}
 	}
 	
-	private void findNextForLastCell(short i, short j) {
+	private void findNextForLastCell(int i, int j) {
 		
 	}
 	
-	private boolean hasSinglePossibility(short i, short j) {
-		short nonZeroCount = 0;
-		for (short k = 0; k < size; ++k) {
-			if (possibilities[i][j][k] != 0) {
-				++nonZeroCount;
-				nextValue = possibilities[i][j][k];
-				if (nonZeroCount > 1) {
-					nextValue = 0;
+	private boolean hasSinglePossibility(int i, int j) {
+		int possibilityCount = 0;
+		for (int k = 0; k < size; ++k) {
+			if (possibilities[i][j][k]) {
+				++possibilityCount;
+				nextValue = k;
+				if (possibilityCount > 1) {
+					nextValue = -1;
 					return false;
 				}
 			}
 		}
-		return nonZeroCount == 1;
+		return possibilityCount == 1;
 	}
 	
-	private void findNextInRow(short i) {
-		for (short k = 0; k < size; ++k) {
+	private void findNextInRow(int i) {
+		for (int k = 0; k < size; ++k) {
 			if (hasSinglePossibility(i, k)) {
 				nextX = i;
 				nextY = k;
@@ -179,8 +188,8 @@ public class SudokuTable {
 		}
 	}
 	
-	private void findNextInColumn(short i) {
-		for (short k = 0; k < size; ++k) {
+	private void findNextInColumn(int i) {
+		for (int k = 0; k < size; ++k) {
 			if (hasSinglePossibility(k, i)) {
 				nextX = k;
 				nextY = i;

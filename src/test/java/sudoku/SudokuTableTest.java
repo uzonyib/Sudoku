@@ -4,10 +4,10 @@ import org.junit.Test;
 
 public class SudokuTableTest {
 	
-	private static short[][] simpleTable = new short[][] {
+	private static int[][] simpleTable = new int[][] {
 			{ 4, 0, 5, 7, 9, 0, 3, 0, 1 },
 			{ 1, 3, 9, 5, 8, 0, 0, 7, 0 },
-			{ 7, 6, 2, 3, 1, 0, 5, 0, 8 },
+			{ 7, 6, 2, 3, 1, 0, 5, 0, 9 },
 			{ 2, 5, 4, 9, 0, 0, 8, 6, 3 },
 			{ 8, 0, 0, 0, 5, 0, 1, 4, 2 },
 			{ 6, 0, 3, 0, 0, 8, 0, 9, 0 },
@@ -23,22 +23,22 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorWithEmptyTable() {
-		new SudokuTable(new short[0][0]);
+		new SudokuTable(new int[0][0]);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorWithAsymmetricTable() {
-		new SudokuTable(new short[9][10]);
+		new SudokuTable(new int[9][10]);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorWithBadSize() {
-		new SudokuTable(new short[10][10]);
+		new SudokuTable(new int[10][10]);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testRowIntegrity() {
-		new SudokuTable(new short[][]{
+		new SudokuTable(new int[][]{
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -53,7 +53,7 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testColumnIntegrity() {
-		new SudokuTable(new short[][]{
+		new SudokuTable(new int[][]{
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -68,7 +68,7 @@ public class SudokuTableTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testBlockIntegrity() {
-		new SudokuTable(new short[][]{
+		new SudokuTable(new int[][]{
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
