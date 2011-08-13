@@ -18,23 +18,82 @@ public class SudokuTable {
 		}
 		
 		this.size = (short) table.length;
-		this.blockSize = (short) Math.sqrt(this.size);
+		this.blockSize = (short) Math.sqrt(size);
 		
-		if (this.blockSize * this.blockSize != this.size) {
+		if (blockSize * blockSize != size) {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
 		initPossibilities();
 		this.table = new short[size][size];
-		for (short i = 0; i < this.size; ++i) {
-			for (short j = 0; j < this.size; ++j) {
-				if (table[i][j] > 0) {
-					this.table[i][j] = table[i][j];
-					this.eliminatePossibilitiesForCell(i, j);
-				}
+		for (short i = 0; i < size; ++i) {
+			for (short j = 0; j < size; ++j) {
+				this.table[i][j] = table[i][j];
 			}
 		}
 		
+		try {
+			checkIntegrity();
+		} catch (IllegalStateException e) {
+			throw new IllegalArgumentException("Integrity problem in argument.", e);
+		}
+		
+		for (short i = 0; i < size; ++i) {
+			for (short j = 0; j < size; ++j) {
+				if (this.table[i][j] > 0) {
+					eliminatePossibilitiesForCell(i, j);
+				}
+			}
+		}
+	}
+
+	private void checkIntegrity() {
+		checkRowsIntegrity();
+		checkColumnsIntegrity();
+		checkBlocksIntegrity();
+	}
+
+	private void checkRowsIntegrity() {
+		for (short i = 0; i < size; ++i) {
+			short[] cardinality = new short[size];
+			for (short j = 0; j < size; ++j) {
+				if (cardinality[table[i][j] - 1] > 0) {
+					throw new IllegalStateException("Integrity problem in row #" + (i + 1) + ".");
+				}
+				++cardinality[table[i][j] - 1];
+			}
+		}
+	}
+	
+	private void checkColumnsIntegrity() {
+		for (short i = 0; i < size; ++i) {
+			short[] cardinality = new short[size];
+			for (short j = 0; j < size; ++j) {
+				if (cardinality[table[j][i] - 1] > 0) {
+					throw new IllegalStateException("Integrity problem in column #" + (i + 1) + ".");
+				}
+				++cardinality[table[j][i] - 1];
+			}
+		}
+	}
+	
+	private void checkBlocksIntegrity() {
+		for (short blockX = 0; blockX < blockSize; ++blockX) {
+			for (short blockY = 0; blockY < blockSize; ++blockY) {
+				short[] cardinality = new short[size];
+				for (short i = 0; i < blockSize; ++i) {
+					short x = (short) (blockX * blockSize + i);
+					for (short j = 0; j < blockSize; ++j) {
+						short y = (short) (blockY * blockSize + j);
+						if (cardinality[table[x][y] - 1] > 0) {
+							throw new IllegalStateException("Integrity problem in block ("
+									+ (x + 1) + "," + (y + 1) + ").");
+						}
+						++cardinality[table[x][y] - 1];
+					}
+				}
+			}
+		}
 	}
 
 	private void initPossibilities() {
@@ -55,8 +114,8 @@ public class SudokuTable {
 	}
 	
 	private void eliminatePossibilitiesInRow(short i, short j) {
-		short value = this.table[i][j];
-		for (short k = 0; k < this.size; ++k) {
+		short value = (short) (table[i][j] - 1);
+		for (short k = 0; k < size; ++k) {
 			if (k == j) {
 				continue;
 			}
@@ -65,28 +124,28 @@ public class SudokuTable {
 	}
 	
 	private void eliminatePossibilitiesInColumn(short i, short j) {
-		short value = this.table[i][j];
-		for (short k = 0; k < this.size; ++k) {
+		short value = (short) (table[i][j] - 1);
+		for (short k = 0; k < size; ++k) {
 			if (k == i) {
 				continue;
 			}
-			this.possibilities[k][j][value] = 0;
+			possibilities[k][j][value] = 0;
 		}
 	}
 	
 	private void eliminatePossibilitiesInBlock(short i, short j) {
-		short value = this.table[i][j];
+		short value = (short) (table[i][j] - 1);
 		short blockX = (short) (i / blockSize);
 		short blockY = (short) (j / blockSize);
 		
-		for (short k = 0; k < this.blockSize; ++k) {
-			short x = (short) (blockX * this.blockSize + k);
-			for (short l = 0; l < this.blockSize; ++l) {
-				short y = (short) (blockY * this.blockSize + l);
+		for (short k = 0; k < blockSize; ++k) {
+			short x = (short) (blockX * blockSize + k);
+			for (short l = 0; l < blockSize; ++l) {
+				short y = (short) (blockY * blockSize + l);
 				if (x == i && y == j) {
 					continue;
 				}
-				this.possibilities[x][y][value] = 0;
+				possibilities[x][y][value] = 0;
 			}
 		}
 	}
@@ -97,12 +156,12 @@ public class SudokuTable {
 	
 	private boolean hasSinglePossibility(short i, short j) {
 		short nonZeroCount = 0;
-		for (short k = 0; k < this.size; ++k) {
-			if (this.possibilities[i][j][k] != 0) {
+		for (short k = 0; k < size; ++k) {
+			if (possibilities[i][j][k] != 0) {
 				++nonZeroCount;
-				this.nextValue = this.possibilities[i][j][k];
+				nextValue = possibilities[i][j][k];
 				if (nonZeroCount > 1) {
-					this.nextValue = 0;
+					nextValue = 0;
 					return false;
 				}
 			}
@@ -111,20 +170,20 @@ public class SudokuTable {
 	}
 	
 	private void findNextInRow(short i) {
-		for (short k = 0; k < this.size; ++k) {
+		for (short k = 0; k < size; ++k) {
 			if (hasSinglePossibility(i, k)) {
-				this.nextX = i;
-				this.nextY = k;
+				nextX = i;
+				nextY = k;
 				return;
 			}
 		}
 	}
 	
 	private void findNextInColumn(short i) {
-		for (short k = 0; k < this.size; ++k) {
+		for (short k = 0; k < size; ++k) {
 			if (hasSinglePossibility(k, i)) {
-				this.nextX = k;
-				this.nextY = i;
+				nextX = k;
+				nextY = i;
 				return;
 			}
 		}
