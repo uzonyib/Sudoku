@@ -1,5 +1,7 @@
 package sudoku;
 
+import java.util.Arrays;
+
 public class SudokuSolver {
 	
 	private SudokuTable sudokuTable;
@@ -32,9 +34,7 @@ public class SudokuSolver {
 		possibilities = new boolean[size][size][size];
 		for (int i = 0; i < size; ++i) {
 			for (int j = 0; j < size; ++j) {
-				for (int k = 0; k < size; ++ k) {
-					possibilities[i][j][k] = true;
-				}
+				Arrays.fill(possibilities[i][j], true);
 			}
 		}
 	}
