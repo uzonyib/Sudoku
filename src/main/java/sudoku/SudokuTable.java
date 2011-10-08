@@ -8,8 +8,14 @@ public class SudokuTable {
 	private int[][] table;
 	
 	public SudokuTable(int[][] table) {
-		if (table == null || table.length == 0 || table.length != table[0].length) {
+		if (table == null || table.length == 0) {
 			throw new IllegalArgumentException("Invalid table size.");
+		}
+		
+		for (int i = 0; i < table.length; ++i) {
+			if (table[i].length != table.length) {
+				throw new IllegalArgumentException("Invalid table size.");
+			}
 		}
 		
 		this.size = table.length;

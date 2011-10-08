@@ -10,10 +10,6 @@ public class SudokuSolver {
 
 	private boolean[][][] possibilities;
 	
-	private int nextX;
-	private int nextY;
-	private int nextValue;
-	
 	public SudokuSolver(SudokuTable sudokuTable) {
 		this.sudokuTable = sudokuTable;
 		this.size = sudokuTable.getSize();
@@ -86,39 +82,37 @@ public class SudokuSolver {
 		
 	}
 	
-	private boolean hasSinglePossibility(int i, int j) {
-		int possibilityCount = 0;
+	private int findStepInCell(int i, int j) {
+		int possibility = -1;
 		for (int k = 0; k < size; ++k) {
 			if (possibilities[i][j][k]) {
-				++possibilityCount;
-				nextValue = k;
-				if (possibilityCount > 1) {
-					nextValue = -1;
-					return false;
+				if (possibility >= 0) {
+					return -1;
 				}
+				possibility = k;
 			}
 		}
-		return possibilityCount == 1;
+		return possibility;
 	}
 	
-	private void findNextInRow(int i) {
+	private Step findStepInRow(int i) {
 		for (int k = 0; k < size; ++k) {
-			if (hasSinglePossibility(i, k)) {
-				nextX = i;
-				nextY = k;
-				return;
+			int possibility = findStepInCell(i, k);
+			if (possibility >= 0) {
+				return new Step(i, k, possibility);
 			}
 		}
+		return null;
 	}
 	
-	private void findNextInColumn(int i) {
+	private Step findStepInColumn(int i) {
 		for (int k = 0; k < size; ++k) {
-			if (hasSinglePossibility(k, i)) {
-				nextX = k;
-				nextY = i;
-				return;
+			int possibility = findStepInCell(k, i);
+			if (possibility >= 0) {
+				return new Step(k, i, possibility);
 			}
 		}
+		return null;
 	}
 
 }
