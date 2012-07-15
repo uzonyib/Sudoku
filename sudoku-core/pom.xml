@@ -8,13 +8,21 @@
   <groupId>sudoku</groupId>
   <artifactId>sudoku-core</artifactId>
   <version>1.0.0-SNAPSHOT</version>
+  <name>Sudoku core</name>
   <dependencies>
   	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<version>4.10</version>
+  		<groupId>org.testng</groupId>
+  		<artifactId>testng</artifactId>
+  		<version>6.5.2</version>
   		<type>jar</type>
   		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.slf4j</groupId>
+  		<artifactId>slf4j-api</artifactId>
+  		<version>1.6.6</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
   	</dependency>
   </dependencies>
 </project>

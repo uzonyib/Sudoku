@@ -1,6 +1,6 @@
-package sudoku;
+package sudoku.core.hint;
 
-class Step {
+public class Step {
 	
 	private final int rowIndex;
 	private final int columnIndex;

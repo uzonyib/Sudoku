@@ -2,15 +2,18 @@ package sudoku;
 
 import java.util.Arrays;
 
+import sudoku.core.hint.Step;
+import sudoku.core.table.Table;
+
 public class SudokuSolver {
 	
-	private SudokuTable sudokuTable;
+	private Table sudokuTable;
 	private int size;
 	private int blockSize;
 
 	private boolean[][][] possibilities;
 	
-	public SudokuSolver(SudokuTable sudokuTable) {
+	public SudokuSolver(Table sudokuTable) {
 		this.sudokuTable = sudokuTable;
 		this.size = sudokuTable.getSize();
 		this.blockSize = sudokuTable.getBlockSize();
