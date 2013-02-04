@@ -1,4 +1,4 @@
-package sudoku.core.table;
+package sudoku.core;
 
 public interface Table {
 	
@@ -6,12 +6,12 @@ public interface Table {
 	
 	int getBlockSize();
 	
-	int get(int rowIndex, int columnIndex);
+	Integer get(int rowIndex, int columnIndex);
 	
 	String getElement(int rowIndex, int columnIndex);
 	
-	boolean checkIntegrity();
-	
 	void set(int rowIndex, int columnIndex, int value);
+	
+	void takeStep(Step step);
 
 }

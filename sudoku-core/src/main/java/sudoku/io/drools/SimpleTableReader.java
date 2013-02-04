@@ -1,18 +1,28 @@
-package sudoku.io;
+package sudoku.io.drools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
-import sudoku.core.table.SimpleTable;
-import sudoku.core.table.Table;
+import sudoku.core.drools.DroolsTable;
+import sudoku.io.TableReader;
 
-public class SimpleLoader implements TableLoader {
+public class SimpleTableReader implements TableReader {
 
 	@Override
-	public Table load(InputStream is) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+	public DroolsTable read(InputStream is) throws IOException {
+		return read(new BufferedReader(new InputStreamReader(is)));
+	}
+	
+	@Override
+	public DroolsTable read(Reader r) throws IOException {
+		return read(new BufferedReader(r));
+		
+	}
+	
+	protected DroolsTable read(BufferedReader reader) throws IOException {
 		int[][] table = null;
 		int rowIndex = 0;
 		int size = -1;
@@ -30,7 +40,7 @@ public class SimpleLoader implements TableLoader {
 			
 			++rowIndex;
 		}
-		return new SimpleTable(table);
+		return new DroolsTable(table);
 	}
 
 }

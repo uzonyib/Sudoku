@@ -1,8 +1,6 @@
-package sudoku.core.hint;
+package sudoku.core;
 
 import java.util.List;
-
-import sudoku.core.table.Table;
 
 public interface Hint {
 	

@@ -1,19 +1,51 @@
-package sudoku;
+package sudoku.core.drools;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import sudoku.core.hint.Step;
-import sudoku.core.table.Table;
+import sudoku.core.Hint;
+import sudoku.core.Solution;
+import sudoku.core.Solver;
+import sudoku.core.Step;
+import sudoku.core.Table;
 
-public class SudokuSolver {
+public class SolverImpl implements Solver {
 	
-	private Table sudokuTable;
+	private List<Hint> hints;
+	
+	public SolverImpl() {
+		hints = new ArrayList<Hint>();
+	}
+	
+	@Override
+	public Solution solve(Table table) {
+		if (table == null) {
+			throw new IllegalArgumentException("Table is null.");
+		}
+		
+		Solution solution = new Solution(table);
+		
+		boolean stepTaken = false;
+		for (int hintIndex = 0; hintIndex < hints.size(); hintIndex += stepTaken ? 0 : 1) {
+			stepTaken = false;
+			Hint hint = hints.get(hintIndex);
+			for (Step step : hint.advise(table)) {
+				table.takeStep(step);
+				solution.getSteps().add(step);
+				stepTaken = true;
+			}
+		}
+		
+		return solution;
+	}
+	
+	/*private Table sudokuTable;
 	private int size;
 	private int blockSize;
 
 	private boolean[][][] possibilities;
 	
-	public SudokuSolver(Table sudokuTable) {
+	public SolverImpl(Table sudokuTable) {
 		this.sudokuTable = sudokuTable;
 		this.size = sudokuTable.getSize();
 		this.blockSize = sudokuTable.getBlockSize();
@@ -116,6 +148,6 @@ public class SudokuSolver {
 			}
 		}
 		return null;
-	}
+	}*/
 
 }

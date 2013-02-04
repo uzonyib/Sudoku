@@ -1,4 +1,4 @@
-package sudoku.core.hint;
+package sudoku.core;
 
 public class Step {
 	
@@ -22,6 +22,11 @@ public class Step {
 	
 	public int getValue() {
 		return value;
+	}
+	
+	@Override
+	public String toString() {
+		return "Set " + value + " in [" + (rowIndex + 1) + "," + (columnIndex + 1) + "]";
 	}
 
 }

@@ -1,22 +1,21 @@
-package sudoku.core.table;
+package sudoku.core.drools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sudoku.core.rule.IntegrityException;
-import sudoku.core.rule.Rule;
-import sudoku.core.table.Table;
+import sudoku.core.Step;
+import sudoku.core.Table;
 
-public class SimpleTable implements Table {
+public class DroolsTable implements Table {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTable.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DroolsTable.class);
 	
 	private int size;
 	private int blockSize;
 	
-	private int[][] table;
+	private Field[][] fields;
 	
-	public SimpleTable(int size) {
+	public DroolsTable(int size) {
 		if (size <= 0) {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
@@ -28,15 +27,15 @@ public class SimpleTable implements Table {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
-		this.table = new int[size][size];
+		this.fields = new Field[size][size];
 		for (int i = 0; i < size; ++i) {
 			for (int j = 0; j < size; ++j) {
-				this.table[i][j] = -1;
+				this.fields[i][j] = new Field(i, j, null, size, blockSize);
 			}
 		}
 	}
 	
-	public SimpleTable(int[][] table) {
+	public DroolsTable(int[][] table) {
 		if (table == null || table.length == 0) {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
@@ -54,18 +53,30 @@ public class SimpleTable implements Table {
 			throw new IllegalArgumentException("Invalid table size.");
 		}
 		
-		this.table = new int[size][size];
+		this.fields = new Field[size][size];
 		for (int i = 0; i < size; ++i) {
 			for (int j = 0; j < size; ++j) {
 				if (table[i][j] < -1 || table[i][j] > getSize()) {
 					throw new IllegalArgumentException("Invalid value: " + table[i][j] + ".");
 				}
-				this.table[i][j] = table[i][j];
+				this.fields[i][j] = new Field(i, j, table[i][j], size, blockSize);
 			}
+		}	
+	}
+	
+	public DroolsTable(Table table) {
+		if (table == null) {
+			throw new IllegalArgumentException("Invalid source table.");
 		}
 		
-		if (!checkIntegrity()) {
-			throw new IllegalArgumentException("Integrity error.");
+		this.size = table.getSize();
+		this.blockSize = table.getBlockSize();
+		
+		this.fields = new Field[size][size];
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
+				this.fields[i][j] = new Field(i, j, table.get(i, j), size, blockSize);
+			}
 		}
 	}
 	
@@ -80,21 +91,13 @@ public class SimpleTable implements Table {
 	}
 	
 	@Override
-	public int get(int x, int y) {
-		return table[x][y];
+	public Integer get(int x, int y) {
+		return fields[x][y].getValue();
 	}
-
+	
 	@Override
-	public boolean checkIntegrity() {
-		for (Rule rule : Rule.values()) {
-			try {
-				rule.checkIntegrity(this);
-			} catch (IntegrityException e) {
-				LOGGER.info(e.getMessage(), e);
-				return false;
-			}
-		}
-		return true;
+	public String getElement(int rowIndex, int columnIndex) {
+		return "" + get(rowIndex, columnIndex);
 	}
 	
 	@Override
@@ -103,24 +106,21 @@ public class SimpleTable implements Table {
 			throw new IllegalArgumentException("Row index out of range.");
 		}
 		if (columnIndex < 0 || columnIndex >= getSize()) {
-			throw new IllegalArgumentException("Columnindex out of range.");
+			throw new IllegalArgumentException("Column index out of range.");
 		}
-		if (value < -1 || value >= getSize()) {
+		if (value < 0 || value >= getSize()) {
 			throw new IllegalArgumentException("Value out of range.");
 		}
 		
-		int originalValue = table[rowIndex][columnIndex];
-		table[rowIndex][columnIndex] = value;
-		
-		if (!checkIntegrity()) {
-			table[rowIndex][columnIndex] = originalValue;
-			throw new IllegalArgumentException("Integrity error when setting value.");
-		}
+		fields[rowIndex][columnIndex].setValue(value);
 	}
 	
 	@Override
-	public String getElement(int rowIndex, int columnIndex) {
-		return "" + get(rowIndex, columnIndex);
+	public void takeStep(Step step) {
+		if (step == null) {
+			throw new IllegalArgumentException("Step is null.");
+		}
+		set(step.getRowIndex(), step.getColumnIndex(), step.getValue());
 	}
 	
 	@Override
@@ -137,13 +137,17 @@ public class SimpleTable implements Table {
 				if (j != 0 && j % blockSize == 0) {
 					builder.append(" ").append(columnSeparator);
 				}
-				int value = get(i, j);
-				builder.append(" ").append(value >= 0 ? value + 1 : ".");
+				Integer value = get(i, j);
+				builder.append(" ").append(value != null && value >= 0 ? value + 1 : ".");
 			}
 			builder.append(" ").append(columnSeparator).append("\n");
 		}
 		builder.append(separatorLine);
 		return builder.toString();
+	}
+	
+	public Field getField(int rowIndex, int columnIndex) {
+		return this.fields[rowIndex][columnIndex];
 	}
 
 }

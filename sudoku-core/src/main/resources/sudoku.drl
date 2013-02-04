@@ -1,0 +1,98 @@
+package sudoku;
+
+import sudoku.core.*;
+import sudoku.core.drools.*;
+
+global Solution solution;
+
+rule "Contradiction in row"
+when
+	$f1 : Field(value != null)
+	$f2 : Field(rowIndex == $f1.rowIndex, columnIndex != $f1.columnIndex, value == $f1.value)
+then
+	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
+	System.out.println("Contradiction of value " + $f1.getValue() + " in row " + ($f1.getRowIndex() + 1));
+end
+
+rule "Contradiction in column"
+when
+	$f1 : Field(value != null)
+	$f2 : Field(columnIndex == $f1.columnIndex, rowIndex != $f1.rowIndex, value == $f1.value)
+then
+	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
+	System.out.println("Contradiction of value " + $f1.getValue() + " in column " + ($f1.getColumnIndex() + 1));
+end
+
+rule "Contradiction in block"
+when
+	$f1 : Field(value != null)
+	$f2 : Field(blockIndex == $f1.blockIndex, (rowIndex != $f1.rowIndex || columnIndex != $f1.columnIndex), value == $f1.value)
+then
+	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
+	System.out.println("Contradiction of value " + $f1.getValue() + " in block " + ($f1.getBlockIndex() + 1));
+end
+
+rule "Table solved"
+when
+	forall ($f : Field()
+		Field(this == $f, value != null))
+then
+	solution.setResultStatus(sudoku.core.Solution.ResultStatus.SOLVED);
+	System.out.println("Table solved");
+end
+
+rule "Table cannot be solved"
+when
+	$f : Field(value == null, candidateCount == 0)
+then
+	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
+	System.out.println("Table cannot be solved, all candidates eliminated in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
+end
+
+rule "Eliminate candidate by row"
+when
+	$f : Field(value != null)
+	$candidate : Field(value == null, hasCandidate($f.value), rowIndex == $f.rowIndex, columnIndex != $f.columnIndex)
+then
+	modify($candidate) {
+		deleteCandidate($f.getValue());
+	}
+	System.out.println($f.getValue() + " may not appear in [" + ($candidate.getRowIndex() + 1) + "," + ($candidate.getColumnIndex() + 1) +
+		"], because it is present in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
+end
+
+rule "Eliminate candidate by column"
+when
+	$f : Field(value != null)
+	$candidate : Field(value == null, hasCandidate($f.value), columnIndex == $f.columnIndex, rowIndex != $f.rowIndex)
+then
+	modify($candidate) {
+		deleteCandidate($f.getValue());
+	}
+	System.out.println($f.getValue() + " may not appear in [" + ($candidate.getRowIndex() + 1) + "," + ($candidate.getColumnIndex() + 1) +
+		"], because it is present in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
+end
+
+rule "Eliminate candidate by block"
+when
+	$f : Field(value != null)
+	$candidate : Field(value == null, hasCandidate($f.value), columnIndex != $f.columnIndex || rowIndex != $f.rowIndex, blockIndex == $f.blockIndex)
+then
+	modify($candidate) {
+		deleteCandidate($f.getValue());
+	}
+	System.out.println($f.getValue() + " may not appear in [" + ($candidate.getRowIndex() + 1) + "," + ($candidate.getColumnIndex() + 1) +
+		"], because it is present in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
+end
+
+rule "Apply single candidate"
+when
+	$f : Field(value == null, singleCandidate != null)
+then
+	modify($f) {
+		setValue($f.getSingleCandidate());
+	}
+	solution.addStep(new Step($f.getRowIndex(), $f.getColumnIndex(), $f.getValue()));
+	System.out.println("Only " + $f.getValue() + " may appear in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
+	System.out.println(solution.getResultTable());
+end
