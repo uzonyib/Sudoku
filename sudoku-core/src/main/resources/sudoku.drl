@@ -7,8 +7,8 @@ global Solution solution;
 
 rule "Contradiction in row"
 when
-	$f1 : Field(value != null)
-	$f2 : Field(rowIndex == $f1.rowIndex, columnIndex != $f1.columnIndex, value == $f1.value)
+	$f1 : DroolsField(value != null)
+	$f2 : DroolsField(rowIndex == $f1.rowIndex, columnIndex != $f1.columnIndex, value == $f1.value)
 then
 	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
 	System.out.println("Contradiction of value " + $f1.getValue() + " in row " + ($f1.getRowIndex() + 1));
@@ -16,8 +16,8 @@ end
 
 rule "Contradiction in column"
 when
-	$f1 : Field(value != null)
-	$f2 : Field(columnIndex == $f1.columnIndex, rowIndex != $f1.rowIndex, value == $f1.value)
+	$f1 : DroolsField(value != null)
+	$f2 : DroolsField(columnIndex == $f1.columnIndex, rowIndex != $f1.rowIndex, value == $f1.value)
 then
 	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
 	System.out.println("Contradiction of value " + $f1.getValue() + " in column " + ($f1.getColumnIndex() + 1));
@@ -25,8 +25,8 @@ end
 
 rule "Contradiction in block"
 when
-	$f1 : Field(value != null)
-	$f2 : Field(blockIndex == $f1.blockIndex, (rowIndex != $f1.rowIndex || columnIndex != $f1.columnIndex), value == $f1.value)
+	$f1 : DroolsField(value != null)
+	$f2 : DroolsField(blockIndex == $f1.blockIndex, (rowIndex != $f1.rowIndex || columnIndex != $f1.columnIndex), value == $f1.value)
 then
 	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
 	System.out.println("Contradiction of value " + $f1.getValue() + " in block " + ($f1.getBlockIndex() + 1));
@@ -34,8 +34,8 @@ end
 
 rule "Table solved"
 when
-	forall ($f : Field()
-		Field(this == $f, value != null))
+	forall ($f : DroolsField()
+		DroolsField(this == $f, value != null))
 then
 	solution.setResultStatus(sudoku.core.Solution.ResultStatus.SOLVED);
 	System.out.println("Table solved");
@@ -43,7 +43,7 @@ end
 
 rule "Table cannot be solved"
 when
-	$f : Field(value == null, candidateCount == 0)
+	$f : DroolsField(value == null, candidateCount == 0)
 then
 	solution.setResultStatus(sudoku.core.Solution.ResultStatus.CONTRADICTION);
 	System.out.println("Table cannot be solved, all candidates eliminated in [" + ($f.getRowIndex() + 1) + "," + ($f.getColumnIndex() + 1) + "]");
@@ -51,8 +51,8 @@ end
 
 rule "Eliminate candidate by row"
 when
-	$f : Field(value != null)
-	$candidate : Field(value == null, hasCandidate($f.value), rowIndex == $f.rowIndex, columnIndex != $f.columnIndex)
+	$f : DroolsField(value != null)
+	$candidate : DroolsField(value == null, hasCandidate($f.value), rowIndex == $f.rowIndex, columnIndex != $f.columnIndex)
 then
 	modify($candidate) {
 		deleteCandidate($f.getValue());
@@ -63,8 +63,8 @@ end
 
 rule "Eliminate candidate by column"
 when
-	$f : Field(value != null)
-	$candidate : Field(value == null, hasCandidate($f.value), columnIndex == $f.columnIndex, rowIndex != $f.rowIndex)
+	$f : DroolsField(value != null)
+	$candidate : DroolsField(value == null, hasCandidate($f.value), columnIndex == $f.columnIndex, rowIndex != $f.rowIndex)
 then
 	modify($candidate) {
 		deleteCandidate($f.getValue());
@@ -75,8 +75,8 @@ end
 
 rule "Eliminate candidate by block"
 when
-	$f : Field(value != null)
-	$candidate : Field(value == null, hasCandidate($f.value), columnIndex != $f.columnIndex || rowIndex != $f.rowIndex, blockIndex == $f.blockIndex)
+	$f : DroolsField(value != null)
+	$candidate : DroolsField(value == null, hasCandidate($f.value), columnIndex != $f.columnIndex || rowIndex != $f.rowIndex, blockIndex == $f.blockIndex)
 then
 	modify($candidate) {
 		deleteCandidate($f.getValue());
@@ -87,7 +87,7 @@ end
 
 rule "Apply single candidate"
 when
-	$f : Field(value == null, singleCandidate != null)
+	$f : DroolsField(value == null, singleCandidate != null)
 then
 	modify($f) {
 		setValue($f.getSingleCandidate());

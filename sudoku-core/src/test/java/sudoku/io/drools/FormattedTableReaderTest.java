@@ -54,9 +54,9 @@ public class FormattedTableReaderTest {
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {
 				if (i != j) {
-					Assert.assertNull(table.get(i, j));
+					Assert.assertNull(table.get(i, j).getValue());
 				} else {
-					Assert.assertEquals(i, table.get(i, j).intValue());
+					Assert.assertEquals(i + 1, table.get(i, j).getValue().getIndex());
 				}
 			}
 		}

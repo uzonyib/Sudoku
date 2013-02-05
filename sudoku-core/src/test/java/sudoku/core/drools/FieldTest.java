@@ -3,6 +3,8 @@ package sudoku.core.drools;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import sudoku.core.Field;
+
 public class FieldTest {
 	
 	@Test

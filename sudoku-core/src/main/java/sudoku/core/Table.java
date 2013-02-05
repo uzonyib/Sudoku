@@ -6,11 +6,9 @@ public interface Table {
 	
 	int getBlockSize();
 	
-	Integer get(int rowIndex, int columnIndex);
+	Field get(int rowIndex, int columnIndex);
 	
-	String getElement(int rowIndex, int columnIndex);
-	
-	void set(int rowIndex, int columnIndex, int value);
+	void set(int rowIndex, int columnIndex, FieldValue value);
 	
 	void takeStep(Step step);
 

@@ -27,11 +27,6 @@ public class DroolsSolver implements Solver {
 		kb.addKnowledgePackages(builder.getKnowledgePackages());
 		StatefulKnowledgeSession session = kb.newStatefulKnowledgeSession();
 		
-//		for (Integrity integrity : IntegrityFactory.getIntegrities()) {
-//			session.insert(integrity);
-//		}
-//		session.insert(table);
-		
 		Solution solution = new Solution(table);
 		session.setGlobal("solution", solution);
 		DroolsTable droolsTable = (DroolsTable) solution.getResultTable();

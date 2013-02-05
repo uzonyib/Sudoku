@@ -35,7 +35,7 @@ public class SimpleTableReader implements TableReader {
 			}
 			
 			for (int columnIndex = 0; columnIndex < size; ++columnIndex) {
-				table[rowIndex][columnIndex] = Integer.valueOf("" + line.charAt(columnIndex)) - 1;
+				table[rowIndex][columnIndex] = Integer.valueOf("" + line.charAt(columnIndex));
 			}
 			
 			++rowIndex;

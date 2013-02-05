@@ -4,12 +4,16 @@ public class Step {
 	
 	private final int rowIndex;
 	private final int columnIndex;
-	private final int value;
+	private final FieldValue value;
 
-	public Step(int rowIndex, int columnIndex, int value) {
+	public Step(int rowIndex, int columnIndex, FieldValue value) {
 		this.rowIndex = rowIndex;
 		this.columnIndex = columnIndex;
 		this.value = value;
+	}
+	
+	public Step(int rowIndex, int columnIndex, int index) {
+		this(rowIndex, columnIndex, FieldValue.valueOf(index));
 	}
 	
 	public int getRowIndex() {
@@ -20,7 +24,7 @@ public class Step {
 		return columnIndex;
 	}
 	
-	public int getValue() {
+	public FieldValue getValue() {
 		return value;
 	}
 	
