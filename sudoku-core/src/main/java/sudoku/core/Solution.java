@@ -3,22 +3,24 @@ package sudoku.core;
 import java.util.LinkedList;
 import java.util.List;
 
-import sudoku.core.drools.DroolsTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Solution {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger("DroolsLogger");
 	
 	public static enum ResultStatus {
 		SOLVED, CONTRADICTION, CANNOT_BE_SOLVED;
 	}
 
-	private ResultStatus resultStatus;
-	private List<Step> steps = new LinkedList<Step>();
-	private Table startingTable;
-	private Table resultTable;
+	protected ResultStatus resultStatus;
+	protected List<Step> steps = new LinkedList<Step>();
+	protected Table startingTable;
+	protected Table resultTable;
 
 	public Solution(Table startingTable) {
 		this.startingTable = startingTable;
-		this.resultTable = new DroolsTable(startingTable);
 	}
 
 	public ResultStatus getResultStatus() {
@@ -27,30 +29,25 @@ public class Solution {
 
 	public void setResultStatus(ResultStatus resultStatus) {
 		this.resultStatus = resultStatus;
+		LOGGER.debug("Result status set to " + resultStatus);
 	}
-
+	
 	public List<Step> getSteps() {
 		return steps;
 	}
 
 	public void addStep(Step step) {
 		this.steps.add(step);
+		LOGGER.debug("Step added: " + step);
+		LOGGER.trace("Current table:\n" + resultTable);
 	}
 
 	public Table getStartingTable() {
 		return startingTable;
 	}
 
-	public void setStartingTable(Table startingTable) {
-		this.startingTable = startingTable;
-	}
-
 	public Table getResultTable() {
 		return resultTable;
-	}
-
-	public void setResultTable(Table resultTable) {
-		this.resultTable = resultTable;
 	}
 	
 	@Override

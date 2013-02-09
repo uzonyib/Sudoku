@@ -1,0 +1,15 @@
+package sudoku;
+
+import sudoku.core.drools.DroolsField;
+
+rule "Eliminate candidate"
+salience 90
+when
+	$f1 : DroolsField(value != null)
+	$f2 : DroolsField(this != $f1, value == null, hasCandidate($f1.value),
+		rowIndex == $f1.rowIndex || columnIndex == $f1.columnIndex || blockIndex == $f1.blockIndex)
+then
+	modify($f2) {
+		deleteCandidate($f1.getValue(), $f1);
+	}
+end

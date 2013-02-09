@@ -2,26 +2,27 @@ package sudoku.core;
 
 public class Step {
 	
-	private final int rowIndex;
-	private final int columnIndex;
+	private final Field field;
 	private final FieldValue value;
 
-	public Step(int rowIndex, int columnIndex, FieldValue value) {
-		this.rowIndex = rowIndex;
-		this.columnIndex = columnIndex;
+	public Step(Field field, FieldValue value) {
+		if (field == null || value == null) {
+			throw new IllegalStateException();
+		}
+		this.field = field;
 		this.value = value;
 	}
 	
-	public Step(int rowIndex, int columnIndex, int index) {
-		this(rowIndex, columnIndex, FieldValue.valueOf(index));
+	public Step(Field field, int index) {
+		this(field, FieldValue.valueOf(index));
 	}
 	
 	public int getRowIndex() {
-		return rowIndex;
+		return this.field.getRowIndex();
 	}
 	
 	public int getColumnIndex() {
-		return columnIndex;
+		return this.field.getColumnIndex();
 	}
 	
 	public FieldValue getValue() {
@@ -30,7 +31,7 @@ public class Step {
 	
 	@Override
 	public String toString() {
-		return "Set " + value + " in [" + (rowIndex + 1) + "," + (columnIndex + 1) + "]";
+		return "Set " + value + " in [" + (getRowIndex() + 1) + "," + (getColumnIndex() + 1) + "]";
 	}
 
 }

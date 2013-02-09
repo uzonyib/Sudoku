@@ -1,0 +1,33 @@
+package sudoku;
+
+import sudoku.core.*;
+import sudoku.core.drools.*;
+
+global Solution solution;
+
+rule "Contradiction"
+salience 100
+when
+	$f1 : DroolsField(value != null)
+	$f2 : DroolsField(this != $f1, value == $f1.value,
+		rowIndex == $f1.rowIndex || columnIndex == $f1.columnIndex || blockIndex == $f1.blockIndex)
+then
+	solution.setResultStatus(Solution.ResultStatus.CONTRADICTION);
+end
+
+rule "No more candidates left"
+salience 100
+when
+	$f : DroolsField(value == null, candidateCount == 0)
+then
+	solution.setResultStatus(Solution.ResultStatus.CONTRADICTION);
+end
+
+rule "Table solved"
+salience 100
+when
+	forall ($f : DroolsField()
+		DroolsField(this == $f, value != null))
+then
+	solution.setResultStatus(Solution.ResultStatus.SOLVED);
+end

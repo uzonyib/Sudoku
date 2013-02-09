@@ -1,6 +1,6 @@
 package sudoku.core;
 
-public interface Table {
+public interface Table extends Iterable<Field> {
 	
 	int getSize();
 	
@@ -10,6 +10,4 @@ public interface Table {
 	
 	void set(int rowIndex, int columnIndex, FieldValue value);
 	
-	void takeStep(Step step);
-
 }

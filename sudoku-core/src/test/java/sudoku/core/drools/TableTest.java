@@ -4,9 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import sudoku.core.FieldValue;
-import sudoku.core.Step;
 import sudoku.core.Table;
-import sudoku.core.drools.DroolsTable;
 
 public class TableTest {
 	
@@ -116,21 +114,6 @@ public class TableTest {
 		table.set(1, 1, FieldValue.valueOf(2));
 		Assert.assertEquals(table.get(1, 1).getValue().getIndex(), 2);
 		Assert.assertEquals(table.get(1, 1).getValue().getDisplayValue(), '2');
-	}
-	
-	@Test
-	public void testTakeStep() {
-		Table table = new DroolsTable(4);
-		table.takeStep(new Step(0, 1, 2));
-		Assert.assertEquals(table.get(0, 1).getValue().getIndex(), 2);
-		table.takeStep(new Step(3, 1, 2));
-		Assert.assertEquals(table.get(3, 1).getValue().getIndex(), 2);
-	}
-	
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testTakeStepWithNull() {
-		Table table = new DroolsTable(4);
-		table.takeStep(null);
 	}
 
 }

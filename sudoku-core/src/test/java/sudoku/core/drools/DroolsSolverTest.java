@@ -27,9 +27,7 @@ public class DroolsSolverTest {
 		Solution solution = solver.solve(new DroolsTable(easyTable));
 		Assert.assertNotNull(solution);
 		Assert.assertNotNull(solution.getResultTable());
-		Assert.assertTrue(solution.getResultStatus() == ResultStatus.SOLVED);
-		
-		System.out.println(solution);
+		Assert.assertEquals(solution.getResultStatus(), ResultStatus.SOLVED);
 	}
 	
 	private static int[][] smallTable = new int[][] {
@@ -45,9 +43,36 @@ public class DroolsSolverTest {
 		Solution solution = solver.solve(new DroolsTable(smallTable));
 		Assert.assertNotNull(solution);
 		Assert.assertNotNull(solution.getResultTable());
-		Assert.assertTrue(solution.getResultStatus() == ResultStatus.SOLVED);
-		
-		System.out.println(solution);
+		Assert.assertEquals(solution.getResultStatus(), ResultStatus.SOLVED);
+		Assert.assertEquals(solution.getResultTable(), new DroolsTable(new int[][] {
+				{ 1, 2, 3, 4 },
+				{ 3, 4, 2, 1 },
+				{ 2, 1, 4, 3 },
+				{ 4, 3, 1, 2 }
+		}));
+	}
+	
+	private static int[][] smallTable2 = new int[][] {
+		{ 1, 0, 0, 0 },
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 0, 1 }
+	};
+	
+	@Test
+	public void solveSmallTable2() {
+		Solver solver = new DroolsSolver();
+		Solution solution = solver.solve(new DroolsTable(smallTable2));
+		Assert.assertNotNull(solution);
+		Assert.assertNotNull(solution.getResultTable());
+		Assert.assertEquals(solution.getResultStatus(), null);
+		Assert.assertEquals(solution.getResultTable(), new DroolsTable(new int[][] {
+				{ 1, 0, 0, 0 },
+				{ 0, 0, 1, 0 },
+				{ 0, 1, 0, 0 },
+				{ 0, 0, 0, 1 }
+		}));
+		Assert.assertEquals(solution.getSteps().size(), 2);
 	}
 
 }

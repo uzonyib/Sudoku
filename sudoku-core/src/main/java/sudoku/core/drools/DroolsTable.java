@@ -1,15 +1,9 @@
 package sudoku.core.drools;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import sudoku.core.FieldValue;
-import sudoku.core.Step;
+import sudoku.core.AbstractTable;
 import sudoku.core.Table;
 
-public class DroolsTable implements Table {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(DroolsTable.class);
+public class DroolsTable extends AbstractTable {
 	
 	private int size;
 	private int blockSize;
@@ -95,56 +89,6 @@ public class DroolsTable implements Table {
 	@Override
 	public DroolsField get(int x, int y) {
 		return fields[x][y];
-	}
-	
-	@Override
-	public void set(int rowIndex, int columnIndex, FieldValue value) {
-		if (rowIndex < 0 || rowIndex >= getSize()) {
-			throw new IllegalArgumentException("Row index out of range.");
-		}
-		if (columnIndex < 0 || columnIndex >= getSize()) {
-			throw new IllegalArgumentException("Column index out of range.");
-		}
-		if (value.getIndex() > getSize()) {
-			throw new IllegalArgumentException("Value out of range.");
-		}
-		
-		fields[rowIndex][columnIndex].setValue(value);
-	}
-	
-	@Override
-	public void takeStep(Step step) {
-		if (step == null) {
-			throw new IllegalArgumentException("Step is null.");
-		}
-		set(step.getRowIndex(), step.getColumnIndex(), step.getValue());
-	}
-	
-	@Override
-	public String toString() {
-		String separatorLine = "  - - -   - - -   - - -";
-		String columnSeparator = "|";
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < size; ++i) {
-			if (i % blockSize == 0) {
-				builder.append(separatorLine).append("\n");
-			}
-			builder.append(columnSeparator);
-			for (int j = 0; j < size; ++j) {
-				if (j != 0 && j % blockSize == 0) {
-					builder.append(" ").append(columnSeparator);
-				}
-				FieldValue value = get(i, j).getValue();
-				builder.append(" ").append(value != null ? value.getDisplayValue() : ".");
-			}
-			builder.append(" ").append(columnSeparator).append("\n");
-		}
-		builder.append(separatorLine);
-		return builder.toString();
-	}
-	
-	public DroolsField getField(int rowIndex, int columnIndex) {
-		return this.fields[rowIndex][columnIndex];
 	}
 
 }
