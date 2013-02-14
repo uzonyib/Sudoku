@@ -21,7 +21,7 @@ public class DroolsSolverTest {
 		{ 9, 2, 0, 0, 3, 7, 4, 0, 6 }
 	};
 	
-	@Test//(enabled = false)
+	@Test
 	public void solveEasyTable() {
 		Solver solver = new DroolsSolver();
 		Solution solution = solver.solve(new DroolsTable(easyTable));
