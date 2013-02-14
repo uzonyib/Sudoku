@@ -21,8 +21,7 @@ public class DroolsSolver implements Solver {
 	
 	private static final String[] RULE_FILES = new String[] {
 		"rules/sudoku.drl",
-		"rules/eliminate_candidate.drl",
-		"rules/single_candidate.drl",
+		"rules/candidate.drl",
 		"rules/value_to_single_field.drl"
 	};
 

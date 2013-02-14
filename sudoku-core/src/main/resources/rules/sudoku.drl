@@ -1,24 +1,16 @@
 package sudoku;
 
-import sudoku.core.*;
-import sudoku.core.drools.*;
+import sudoku.core.Solution;
+import sudoku.core.drools.DroolsField;
 
 global Solution solution;
 
 rule "Contradiction"
 salience 100
 when
-	$f1 : DroolsField(value != null)
-	$f2 : DroolsField(this != $f1, value == $f1.value,
-		rowIndex == $f1.rowIndex || columnIndex == $f1.columnIndex || blockIndex == $f1.blockIndex)
-then
-	solution.setResultStatus(Solution.ResultStatus.CONTRADICTION);
-end
-
-rule "No more candidates left"
-salience 100
-when
-	$f : DroolsField(value == null, candidateCount == 0)
+	$field1 : DroolsField(value != null)
+	$field2 : DroolsField(this != $field1, value == $field1.value,
+		rowIndex == $field1.rowIndex || columnIndex == $field1.columnIndex || blockIndex == $field1.blockIndex)
 then
 	solution.setResultStatus(Solution.ResultStatus.CONTRADICTION);
 end
@@ -26,8 +18,7 @@ end
 rule "Table solved"
 salience 100
 when
-	forall ($f : DroolsField()
-		DroolsField(this == $f, value != null))
+	not DroolsField(value == null)
 then
 	solution.setResultStatus(Solution.ResultStatus.SOLVED);
 end

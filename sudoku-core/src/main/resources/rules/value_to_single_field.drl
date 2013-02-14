@@ -1,46 +1,41 @@
 package sudoku;
 
 import sudoku.core.FieldValue;
+import sudoku.core.drools.Candidate;
 import sudoku.core.drools.DroolsField;
 
 rule "Apply candidate in single field of row"
 salience 0
 when
-	$fv : FieldValue()
-	$f1 : DroolsField(value == null, hasCandidate($fv))
-	forall ($f2 : DroolsField(this != $f1, value == null, rowIndex == $f1.rowIndex)
-		DroolsField(this == $f2, !hasCandidate($fv))
-	)
+	$field : DroolsField(value == null)
+	$candidate : Candidate(field == $field)
+	not Candidate(this != $candidate, field.rowIndex == $field.rowIndex, value == $candidate.value)
 then
-	modify($f1) {
-		setValue($fv);
+	modify($field) {
+		setValue($candidate.getValue());
 	}
 end
 
 rule "Apply candidate in single field of column"
 salience 0
 when
-	$fv : FieldValue()
-	$f1 : DroolsField(value == null, hasCandidate($fv))
-	forall ($f2 : DroolsField(this != $f1, value == null, columnIndex == $f1.columnIndex)
-		DroolsField(this == $f2, !hasCandidate($fv))
-	)
+	$field : DroolsField(value == null)
+	$candidate : Candidate(field == $field)
+	not Candidate(this != $candidate, field.columnIndex == $field.columnIndex, value == $candidate.value)
 then
-	modify($f1) {
-		setValue($fv);
+	modify($field) {
+		setValue($candidate.getValue());
 	}
 end
 
 rule "Apply candidate in single field of block"
 salience 0
 when
-	$fv : FieldValue()
-	$f1 : DroolsField(value == null, hasCandidate($fv))
-	forall ($f2 : DroolsField(this != $f1, value == null, blockIndex == $f1.blockIndex)
-		DroolsField(this == $f2, !hasCandidate($fv))
-	)
+	$field : DroolsField(value == null)
+	$candidate : Candidate(field == $field)
+	not Candidate(this != $candidate, field.blockIndex == $field.blockIndex, value == $candidate.value)
 then
-	modify($f1) {
-		setValue($fv);
+	modify($field) {
+		setValue($candidate.getValue());
 	}
 end

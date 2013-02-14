@@ -1,0 +1,40 @@
+package sudoku;
+
+import java.util.LinkedList;
+import sudoku.core.FieldValue;
+import sudoku.core.drools.Candidate;
+import sudoku.core.drools.DroolsField;
+
+rule "Insert candidate"
+salience 99
+when
+	$field : DroolsField(value == null)
+	$value : FieldValue()
+	forall ($f : DroolsField(this != $field, value != null,
+		rowIndex == $field.rowIndex || columnIndex == $field.columnIndex || blockIndex == $field.blockIndex)
+		DroolsField(this == $f, value != $value)
+	)
+then
+	insertLogical(new Candidate($field, $value));
+end
+
+rule "No more candidates left"
+salience 90
+when
+	$field : DroolsField(value == null)
+	not $candidate : Candidate(field == $field)
+then
+	solution.setResultStatus(Solution.ResultStatus.CONTRADICTION);
+end
+
+rule "Apply single candidate"
+salience 80
+when
+	$field : DroolsField(value == null)
+	$candidates : LinkedList(size == 1)
+		from collect (Candidate(field == $field))
+then
+	modify($field) {
+		setValue(((Candidate) $candidates.getFirst()).getValue());
+	}
+end

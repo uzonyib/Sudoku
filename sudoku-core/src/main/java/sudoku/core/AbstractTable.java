@@ -79,5 +79,14 @@ public abstract class AbstractTable implements Table {
 		}
 		return true;
 	}
+	
+	@Override
+	public int hashCode() {
+		int hashCode = 17;
+		for (Field field : this) {
+			hashCode += 30 * field.hashCode();
+		}
+		return hashCode;
+	}
 
 }

@@ -58,7 +58,11 @@ public class Field {
 	
 	@Override
 	public int hashCode() {
-		return this.rowIndex + 31 * this.columnIndex;
+		int hashCode = 17;
+		hashCode += 31 * this.rowIndex;
+		hashCode += 31 * this.columnIndex;
+		hashCode += (this.value == null ? 0 : 31 * value.hashCode());
+		return hashCode;
 	}
 	
 	@Override
